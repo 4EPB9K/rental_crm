@@ -1,0 +1,28 @@
+{# Универсальная форма: поля строятся по описанию сущности #}
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% block title %}{{ heading }}{% endblock %}
+
+{% block content %}
+<h1>{{ heading }}</h1>
+
+{% if from_draft %}
+  <div class="draft">Форма заполнена из черновика, сохранённого в сессии.</div>
+{% endif %}
+
+<!-- novalidate: отключаем проверку браузера, чтобы показать серверную -->
+<form class="form" method="post" action="{{ action }}" novalidate>
+  {% if viewstate %}{{ ui.viewstate_field(viewstate) }}{% endif %}
+  {% for f in entity.fields %}
+    {{ ui.form_field(f, v[f.name], errors[f.name]) }}
+  {% endfor %}
+
+  <div class="form-buttons">
+    <button class="btn" type="submit" name="action" value="save">Сохранить</button>
+    {% if is_new %}
+      <button class="btn btn-quiet" type="submit" name="action" value="draft">Сохранить черновик</button>
+    {% endif %}
+    <a class="btn btn-quiet" href="{{ url_for(entity.name ~ '.index') }}">Отмена</a>
+  </div>
+</form>
+{% endblock %}

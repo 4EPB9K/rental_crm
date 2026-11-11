@@ -1,0 +1,50 @@
+{# Универсальный список: работает с любой сущностью по её описанию #}
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% block title %}{{ entity.title }}{% endblock %}
+
+{% block content %}
+<div class="page-top">
+  <h1>{{ entity.title }}</h1>
+  <a class="btn" href="{{ url_for(entity.name ~ '.new') }}">Добавить</a>
+</div>
+
+{% if has_draft %}
+<div class="draft">
+  Есть несохранённый черновик.
+  <a href="{{ url_for(entity.name ~ '.new') }}">Продолжить</a>
+  <form method="post" action="{{ url_for(entity.name ~ '.draft_delete') }}">
+    <button class="link-danger" type="submit">Удалить черновик</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="card">
+{% if rows %}
+  <table>
+    <thead>
+      <tr>
+        {% for f in entity.fields %}<th>{{ f.label }}</th>{% endfor %}
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for f in entity.fields %}<td>{{ ui.cell(f, row[f.name]) }}</td>{% endfor %}
+        <td class="actions">
+          <a href="{{ url_for(entity.name ~ '.edit', item_id=row.id) }}">Изменить</a>
+          <form method="post" action="{{ url_for(entity.name ~ '.delete', item_id=row.id) }}"
+                onsubmit="return confirm('Удалить эту запись?');">
+            <button class="link-danger" type="submit">Удалить</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="empty">{{ entity.empty_text }}</p>
+{% endif %}
+</div>
+{% endblock %}

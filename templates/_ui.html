@@ -1,0 +1,42 @@
+{# Переиспользуемые элементы интерфейса (аналог User Controls в ASP.NET).
+   Подключаются в шаблонах через {% import "_ui.html" as ui %}. #}
+
+{# Ячейка таблицы: значение поля в нужном виде #}
+{% macro cell(f, value) -%}
+  {% set text = display(f, value) %}
+  {% if f.badge and value %}
+    <span class="badge s-{{ value }}">{{ text }}</span>
+  {% elif text == "—" %}
+    <span class="sub">—</span>
+  {% else %}
+    {{ text }}
+  {% endif %}
+{%- endmacro %}
+
+{# Поле формы: подпись, ввод нужного типа, подсказка и ошибка #}
+{% macro form_field(f, value, error) -%}
+  <div class="field">
+    <label for="{{ f.name }}">{{ f.label }}{% if not f.required %} <span class="sub">(необязательно)</span>{% endif %}</label>
+
+    {% if f.kind == "select" %}
+      <select id="{{ f.name }}" name="{{ f.name }}">
+        {% for key, label in f.choices.items() %}
+          <option value="{{ key }}" {% if value == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    {% else %}
+      <input id="{{ f.name }}" name="{{ f.name }}"
+             type="{{ 'number' if f.kind == 'number' else 'text' }}"
+             value="{{ value if value is not none else '' }}">
+    {% endif %}
+
+    {% if f.hint %}<div class="hint">{{ f.hint }}</div>{% endif %}
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  </div>
+{%- endmacro %}
+
+
+{# Скрытое поле ViewState: состояние страницы ездит между клиентом и сервером #}
+{% macro viewstate_field(value) -%}
+  <input type="hidden" name="__VIEWSTATE" value="{{ value }}">
+{%- endmacro %}

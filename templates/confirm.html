@@ -1,0 +1,42 @@
+{# Подтверждение изменений: обе версии записи едут в скрытом поле ViewState #}
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% block title %}Подтверждение изменений{% endblock %}
+
+{% block content %}
+<h1>Проверьте изменения</h1>
+
+<div class="card confirm">
+  <table>
+    <thead>
+      <tr><th>Поле</th><th>Было</th><th>Стало</th></tr>
+    </thead>
+    <tbody>
+      {% for label, old, new in diff %}
+      <tr>
+        <td>{{ label }}</td>
+        <td class="old">{{ old }}</td>
+        <td class="new">{{ new }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<form method="post" action="{{ url_for(entity.name ~ '.confirm', item_id=item_id) }}">
+  {{ ui.viewstate_field(viewstate) }}
+  <div class="form-buttons">
+    <button class="btn" type="submit" name="action" value="confirm">Подтвердить</button>
+    <button class="btn btn-quiet" type="submit" name="action" value="back">Вернуться к редактированию</button>
+  </div>
+</form>
+
+{# Для наглядности: что лежит в ViewState после разбора на сервере #}
+<details class="vs-debug">
+  <summary>Содержимое ViewState</summary>
+  <p class="sub">В скрытом поле (сериализовано и подписано):</p>
+  <pre>{{ viewstate }}</pre>
+  <p class="sub">После разбора на сервере:</p>
+  <pre>{{ state_json }}</pre>
+</details>
+{% endblock %}
